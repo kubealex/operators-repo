@@ -11,7 +11,7 @@
 - name: Create OCP Resources to prepare operator setup
   kubernetes.core.k8s:
     state: present
-    src: "{{ lookup('ansible.builtin.template', item) }}"
+    src: "{{ lookup('ansible.builtin.template', item)| from_yaml }}"
   loop:
     - templates/01-acm/00-acm-project.yml
     - templates/01-acm/01-acm-operatorgroup.yml
