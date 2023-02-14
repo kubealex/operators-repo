@@ -1,0 +1,6 @@
+collections:
+  - community.okd
+  - kubernetes.core
+roles:
+  - name: role-install-operator
+    src: https://github.com/kubealex/operators-repo.git
