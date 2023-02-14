@@ -1,0 +1,18 @@
+---
+# tasks file for operator-init
+- name: Log in (obtain access token)
+  community.okd.openshift_auth:
+    username: "{{ ocp_username }}"
+    password: "{{ ocp_password }}"
+    host: "{{ ocp_api_url }}"
+    verify_ssl: false
+  register: openshift_auth_results
+
+- name: Create OCP Resources to prepare operator setup
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ lookup('ansible.builtin.template', item) }}"
+  loop:
+    - templates/01-acm/00-acm-project.yml
+    - templates/01-acm/01-acm-operatorgroup.yml
+    - templates/01-acm/02-acm-subscription.yml
