@@ -2,10 +2,15 @@
 - name: Install ACM
   hosts: localhost
   vars:
-    ocp_username: admin
-    ocp_password: openshift
-    ocp_api_url: https://api.hub.ocpdemo.labs:6443
+    ocp_username:
+    ocp_password:
+    ocp_api_url:
   tasks:
+    - name: Fail fast if variables are note defined
+      ansible.builtin.fail:
+        msg: Please define OCP connection variables
+      when: (ocp_username == None or ocp_username is not defined ) or (ocp_password == None or ocp_password is not defined) or (ocp_api_url == None or ocp_api_url is not defined)
+
     - name: Log in (obtain access token)
       community.okd.openshift_auth:
         username: "{{ ocp_username }}"
