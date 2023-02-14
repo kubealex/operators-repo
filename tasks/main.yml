@@ -1,5 +1,4 @@
 ---
-# tasks file for operator-init
 - name: Log in (obtain access token)
   community.okd.openshift_auth:
     username: "{{ ocp_username }}"
@@ -11,8 +10,30 @@
 - name: Create OCP Resources to prepare operator setup
   kubernetes.core.k8s:
     state: present
-    src: "{{ lookup('ansible.builtin.template', item)| from_yaml }}"
+    definition: "{{ lookup('ansible.builtin.template', item) }}"
+    api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+    host: "{{ ocp_api_url }}"
+    verify_ssl: false
   loop:
     - templates/01-acm/00-acm-project.yml
     - templates/01-acm/01-acm-operatorgroup.yml
     - templates/01-acm/02-acm-subscription.yml
+
+- name: Check Operator instantiation
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: open-cluster-management
+    wait: true
+    wait_sleep: 60
+    label_selectors:
+      - name=multiclusterhub-operator
+
+- name: Create OCP Resources to prepare operator setup
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', item) }}"
+    api_key: "{{ openshift_auth_results.openshift_auth.api_key }}"
+    host: "{{ ocp_api_url }}"
+    verify_ssl: false
+  loop:
+    - templates/acm_multiclusterhub.yml
